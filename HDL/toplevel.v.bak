@@ -1,0 +1,105 @@
+module toplevel (
+
+
+
+
+);
+wire [3:0] ra1ew,ra1dw,ra2ew,ra2dw,wa3ew,wa3mw,wa3ww,
+wire branchtakenew, pcsrcdw, pcsrcew, pcsrcmw, pcsrcww;
+wire regwriteww,regwritemw, memtoregew;
+
+hazard hazard_unit(
+        .RA1E(ra1ew),
+        .RA1D(ra1dw),
+        .RA2E(ra2ew),
+        .RA2D(ra2dw),
+        .WA3E(wa3ew),
+        .WA3M(wa3mw),
+        .WA3W(wa3ww),
+        .RegWriteM(regwritemw),
+        .RegWriteW(regwriteww),
+        .MemtoRegE(memtoregew),
+        .BranchE(BranchE), //not done
+        .PCSrcD(pcsrcdw),
+        .PCSrcE(pcsrcew),
+        .PCSrcM(pcsrcmw),
+        .PCSrcW(pcsrcww),
+        .BranchTakenE(branchtakenew),
+        //outputs below
+		  .ForwardAE(ForwardAE),
+        .ForwardBE(ForwardBE),
+        .LDRstall(LDRstall),
+        .PCWrPendingF(PCWrPendingF),
+        .StallF(StallF),
+        .StallD(StallD),
+        .FlushD(FlushD),
+        .FlushE(FlushE)
+    );
+	 
+controller ctrl_unit(
+        .reset(reset),
+        .clk(clk),
+        .Op(Op),
+        .Funct(Funct),
+        .Rd(Rd),
+        .Src2(Src2),
+        .Cond(Cond),
+        .CO(CO),
+        .OVF(OVF),
+        .N(N),
+        .Z(Z),
+        .ImmSrc_d(ImmSrc_d),
+        .ShiftControl_e(ShiftControl_e),
+        .RegSrc_d(RegSrc_d),
+        .ALUControl_e(ALUControl_e),
+        .shamt_e(shamt_e),
+        .ALUSrc_e(ALUSrc_e),
+        .CarryIN(CarryIN),
+        .RegWrite_w(regwriteww),
+        .MemWrite_m(MemWrite_m),
+        .MemtoReg_w(MemtoReg_w),
+        .branchtakene(branchtakene),
+        .PCSrc_w(pcsrcww),
+        .PCSrc_mp(pcsrcmw),
+        .PCSrc_ep(pcsrcew),
+        .PCSrc_dp(pcsrcdw),
+        .RegWrite_mp(regwritemw),
+        .MemtoReg_ep(memtoregew)
+    );
+	
+datapath datapath_inst (
+        .pcsrcw(pcsrcw),
+        .branchtakene(branchtakenew),
+        .clk(clk),
+        .stallf(stallf),
+        .stalld(stalld),
+        .flushd(flushd),
+        .regwritew(regwritew),
+        .blsel(blsel),
+        .flushe(flushe),
+        .reset(reset),
+        .forwardae(forwardae),
+        .forwardbe(forwardbe),
+        .alusrce(alusrce),
+        .wemwritem(wemwritem),
+        .memtoregw(memtoregw),
+        .regsrcd(regsrcd),
+        .immsrcd(immsrcd),
+        .shcontrol(shcontrol),
+        .debugsselect(debugsselect),
+        .alucontrole(alucontrole),
+        .debugoutwire(debugoutwire),
+        .shamt(shamt),
+        .aluflags(aluflags),
+        .ra1ep(ra1ew),
+        .ra2ep(ra2ew),
+        .ra1dp(ra1dw),
+        .ra2dp(ra2dw),
+        .wa3ep(wa3ew),
+        .wa3mp(wa3mw),
+        .wa3wp(wa3ww)
+    );
+
+
+
+endmodule

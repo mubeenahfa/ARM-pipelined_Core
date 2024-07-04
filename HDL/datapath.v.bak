@@ -1,0 +1,44 @@
+module (
+input pcsrcw, branchtakene, clk,stallf,stalld,flushd
+
+);
+wire [31:0] bwpcmux, wirefpin, pcf,inmemtodec;
+Mux_2to1 #(32) pcfirstmux (
+    .select(pcsrcw),
+    .input_0(),//empty
+    .input_1(), //empty
+    .output_value(bwpcmux)
+);
+Mux_2to1 #(32) pcsecmux (
+    .select(branchtakene),
+    .input_0(bwpcmux),
+    .input_1(), //empty
+    .output_value(wirefpin)
+);
+Register_rsten #(32) fetchpipeline (
+    .clk(clk),
+    .reset(), //empty	
+    .we(~stallf),
+    .DATA(wirefpin),
+    .OUT(pcf)
+);
+Instruction_memory #(4,32) instruction_memory_instance (
+    .ADDR(pcf),
+    .RD(inmemtodec)
+	 
+);
+Register_rsten #(32) decpipeline (
+    .clk(clk),
+    .reset(flushd),	
+    .we(~stalld),
+    .DATA(inmemtodec),
+    .OUT()//empty
+);
+
+
+
+
+
+
+
+endmodule

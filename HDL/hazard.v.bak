@@ -1,0 +1,50 @@
+module ControlUnit(
+    input wire [4:0] RA1E, RA1D, RA2E, RA2D, WA3E, WA3M, WA3W, 
+    input wire RegWriteM, RegWriteW, MentoRegE, BranchE, CondEx, 
+    input wire PCSrcD, PCSrcE, PCSrcM, PCSrcW, 
+    output reg [1:0] ForwardAE, ForwardBE, 
+    output reg LDRstall, 
+	 input BranchTakenE,
+    output reg PCWrPendingF, StallF, StallD, FlushD, FlushE
+);
+
+
+wire Match_1E_M = (RA1E == WA3M);
+wire Match_1E_W = (RA1E == WA3W);
+wire Match_2E_M = (RA2E == WA3M);
+wire Match_2E_W = (RA2E == WA3W);
+
+
+always @(*) begin
+    if (Match_1E_M && RegWriteM)
+        ForwardAE = 2'b10;
+    else if (Match_1E_W && RegWriteW)
+        ForwardAE = 2'b01;
+    else
+        ForwardAE = 2'b00;
+
+    if (Match_2E_M && RegWriteM)
+        ForwardBE = 2'b10;
+    else if (Match_2E_W && RegWriteW)
+        ForwardBE = 2'b01;
+    else
+        ForwardBE = 2'b00;
+end
+
+
+always @(*) begin
+
+    wire Match_12D_E = (RA1D == WA3E) || (RA2D == WA3E);
+    LDRstall = Match_12D_E && MentoRegE;
+
+
+
+    PCWrPendingF = PCSrcD || PCSrcE || PCSrcM; 
+    StallF = LDRstall || PCWrPendingF; 
+    
+    StallD = LDRstall;
+    FlushD = PCWrPendingF || PCSrcW || BranchTakenE; 
+    FlushE = LDRstall || BranchTakenE;
+end
+
+endmodule
